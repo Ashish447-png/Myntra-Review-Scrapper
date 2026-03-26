@@ -202,49 +202,67 @@ class ScrapeReviews:
 
     def get_review_data(self) -> pd.DataFrame:
         try:
-            # search_string = self.request.form["content"].replace(" ", "-")
-            # no_of_products = int(self.request.form["prod_no"])
-
             product_urls = self.scrape_product_urls(product_name=self.product_name)
 
-            
+            if not product_urls:
+                return pd.DataFrame(
+                    columns=[
+                        "Product Name",
+                        "Over_All_Rating",
+                        "Price",
+                        "Date",
+                        "Rating",
+                        "Name",
+                        "Comment",
+                    ]
+                )
 
             product_details = []
-
             review_len = 0
+            max_products = min(self.no_of_products, len(product_urls))
 
-
-            while review_len < self.no_of_products:
+            while review_len < max_products and product_urls:
                 product_url = product_urls[review_len]
                 review = self.extract_reviews(product_url)
 
                 if review:
                     product_detail = self.extract_products(review)
-                    product_details.append(product_detail)
-
+                    if product_detail is not None and not product_detail.empty:
+                        product_details.append(product_detail)
                     review_len += 1
                 else:
                     product_urls.pop(review_len)
-                
-                time.sleep(random.uniform(3, 7))  # Add delay between products to avoid rate limiting
+                    max_products = min(max_products, len(product_urls))
 
-            self.driver.quit()
+                time.sleep(random.uniform(3, 7))
 
-            data = pd.concat(product_details, axis=0)
-            
+            if product_details:
+                data = pd.concat(product_details, axis=0)
+            else:
+                data = pd.DataFrame(
+                    columns=[
+                        "Product Name",
+                        "Over_All_Rating",
+                        "Price",
+                        "Date",
+                        "Rating",
+                        "Name",
+                        "Comment",
+                    ]
+                )
+
             data.to_csv("data.csv", index=False)
-            
             return data
-            
-            
-                
-            # columns = data.columns
-
-            # values = [[data.loc[i, col] for col in data.columns ] for i in range(len(data)) ]
-            
-            # return columns, values
-        
-    
 
         except Exception as e:
             raise CustomException(e, sys)
+
+        finally:
+            try:
+                self.driver.quit()
+            except Exception:
+                pass
+
+            # columns = data.columns
+            # values = [[data.loc[i, col] for col in data.columns ] for i in range(len(data)) ]
+            # return columns, values
