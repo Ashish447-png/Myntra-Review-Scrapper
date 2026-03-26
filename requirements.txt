@@ -1,0 +1,12 @@
+beautifulsoup4
+selenium
+flask
+flask-cors
+gunicorn
+plotly
+python-dotenv
+streamlit
+pandas
+pymongo
+
+-e .
