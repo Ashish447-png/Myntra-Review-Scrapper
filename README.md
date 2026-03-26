@@ -10,13 +10,13 @@ To set up the project locally, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/PWskills-DataScienceTeam/myntra-review-scrapper.git
+   git clone https://github.com/Ashish447-png/Myntra-Review-Scrapper.git
    cd myntra-review-scraper
    ```
 
 2. Create a new conda environment and activate it
 ```bash
-conda create -p ./env python=3.10 -y
+conda create -p ./env python=3.13 -y
 #to activate the environment
 conda activate ./env 
 #or 
